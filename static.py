@@ -4,11 +4,11 @@ import json
 import csv
 from datetime import datetime
 
-def scrape_bitcoin_price()
+def scrape_bitcoin_price():
     url = httpswww.tradingview.comsymbolsBTCUSDT  # 請替換成您選擇的頁面 URL
     headers = {'User-Agent' 'Mozilla5.0 (Windows NT 10.0; Win64; x64) AppleWebKit537.36 (KHTML, like Gecko) Chrome58.0.3029.110 Safari537.3'}
 
-    try
+    try:
         response = requests.get(url, headers=headers)
         response.raise_for_status()  # 如果發生錯誤，例如 404 或 500，會拋出異常
         soup = BeautifulSoup(response.content, 'html.parser')
@@ -17,11 +17,11 @@ def scrape_bitcoin_price()
         # 這是一個範例選擇器，您可能需要根據實際情況調整
         price_element = soup.find('span', {'class' 'tv-symbol-price-quote__value'})
 
-        if price_element
+        if price_element:
             price = price_element.text.strip()
             timestamp = datetime.now().isoformat()
             return {timestamp timestamp, price price}
-        else
+        else:
             print(找不到比特幣價格元素。請檢查網頁結構。)
             return None
 
