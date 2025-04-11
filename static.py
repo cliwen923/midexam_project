@@ -1,51 +1,58 @@
 import requests
-from bs4 import BeautifulSoup
 import json
 import csv
 from datetime import datetime
+import os
 
 def scrape_bitcoin_price():
-    url = httpswww.tradingview.comsymbolsBTCUSDT  # 請替換成您選擇的頁面 URL
-    headers = {'User-Agent' 'Mozilla5.0 (Windows NT 10.0; Win64; x64) AppleWebKit537.36 (KHTML, like Gecko) Chrome58.0.3029.110 Safari537.3'}
+    url = "https://api.binance.com/api/v3/ticker/price"
+    params = {"symbol": "BTCUSDT"}  # 您可以更改交易對，例如 BTCEUR
 
     try:
-        response = requests.get(url, headers=headers)
+        response = requests.get(url, params=params)
         response.raise_for_status()  # 如果發生錯誤，例如 404 或 500，會拋出異常
-        soup = BeautifulSoup(response.content, 'html.parser')
-
-        # 您需要檢查 TradingView 頁面的 HTML 結構，找到包含比特幣價格的元素
-        # 這是一個範例選擇器，您可能需要根據實際情況調整
-        price_element = soup.find('span', {'class' 'tv-symbol-price-quote__value'})
-
-        if price_element:
-            price = price_element.text.strip()
-            timestamp = datetime.now().isoformat()
-            return {timestamp timestamp, price price}
-        else:
-            print(找不到比特幣價格元素。請檢查網頁結構。)
-            return None
-
-    except requests.exceptions.RequestException as e
-        print(f抓取網頁時發生錯誤：{e})
+        data = response.json()
+        price = data["price"]
+        timestamp = datetime.now().isoformat()
+        return {"timestamp": timestamp, "price": price}
+    except requests.exceptions.RequestException as e:
+        print(f"抓取幣安 API 時發生錯誤：{e}")
+        return None
+    except KeyError:
+        print("無法在幣安 API 回應中找到 'price'。請檢查 API 回應格式。")
         return None
 
-def save_to_json(data, filename=static.json)
-    if data
-        with open(filename, 'w') as f
-            json.dump(data, f)
-        print(f資料已儲存至 {filename})
+def save_to_json(data, filename="static.json"):
+    existing_data = []
+    if os.path.exists(filename):
+        try:
+            with open(filename, 'r') as f:
+                existing_data = json.load(f)
+                if not isinstance(existing_data, list):
+                    existing_data = [existing_data]  # 如果現有資料不是列表，則將其轉換為列表
+        except json.JSONDecodeError:
+            print(f"警告：無法解碼 {filename} 中的現有 JSON。將覆寫為新資料。")
+            existing_data = []
+        except FileNotFoundError:
+            pass  # 如果檔案不存在，則保持 existing_data 為空列表
 
-def save_to_csv(data, filename=static.csv)
-    if data
-        with open(filename, 'a', newline='') as f
-            writer = csv.writer(f)
-            if f.tell() == 0  # 如果檔案是空的，寫入標題
-                writer.writerow([timestamp, price])
-            writer.writerow([data[timestamp], data[price]])
-        print(f資料已附加至 {filename})
+    existing_data.append(data)
 
-if __name__ == __main__
+    with open(filename, 'w') as f:
+        json.dump(existing_data, f, indent=4)
+    print(f"從幣安獲取的比特幣價格已附加至 {filename}")
+
+def save_to_csv(data, filename="static.csv"):
+    file_exists = os.path.exists(filename)
+    with open(filename, 'a', newline='') as f:
+        writer = csv.writer(f)
+        if not file_exists:
+            writer.writerow(["timestamp", "price"])
+        writer.writerow([data["timestamp"], data["price"]])
+    print(f"從幣安獲取的比特幣價格已附加至 {filename}")
+
+if __name__ == "__main__":
     bitcoin_data = scrape_bitcoin_price()
-    if bitcoin_data
+    if bitcoin_data:
         save_to_json(bitcoin_data)
         save_to_csv(bitcoin_data)
