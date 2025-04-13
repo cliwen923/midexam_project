@@ -2,7 +2,7 @@ name: Fetch Bitcoin Price
 
 on:
   schedule:
-    - cron: '0 * * * *'  # 每小時的第 0 分執行一次 (您可以根據需求調整)
+    - cron: '* * * * *'  # 每小時的第 0 分執行一次 
   workflow_dispatch: # 允許手動觸發 workflow
 
 jobs:
