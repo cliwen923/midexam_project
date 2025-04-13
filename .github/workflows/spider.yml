@@ -2,7 +2,7 @@ name: Fetch Bitcoin Price
 
 on:
   schedule:
-    - cron: '* * * * *'  # 每分鐘執行一次
+    - cron: '6 * * * *'  # 第六分鐘執行一次
   workflow_dispatch:
 
 jobs:
