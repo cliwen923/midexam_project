@@ -2,8 +2,8 @@ name: Fetch Bitcoin Price
 
 on:
   schedule:
-    - cron: '* * * * *'  # 每小時的第 0 分執行一次 
-  workflow_dispatch: # 允許手動觸發 workflow
+    - cron: '* * * * *'  # 每分鐘執行一次
+  workflow_dispatch:
 
 jobs:
   scrape:
@@ -20,7 +20,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install requests beautifulsoup4
+          pip install requests
 
       - name: Run scraper
         run: python static.py
@@ -28,5 +28,5 @@ jobs:
       - name: Commit and push changes
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: "Update Bitcoin price data"
+          commit_message: "Update Bitcoin price data every minute"
           file_pattern: static.json static.csv
